@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Mimecast Administration Console Extender
 // @namespace    https://login-au.mimecast.com/
-// @version      0.1
+// @version      0.2
 // @description  Adds features to Mimecast Administration Console
 // @author       Lachlan Horsey
 // @match        https://login-au.mimecast.com/administration/app/
@@ -10,49 +10,70 @@
 // ==/UserScript==
 
 (function() {
-  'use strict';
+  'use strict'
   setInterval(() => { //Check for new tasks every 5 seconds
     if (location.hash == "#/message-center/held-messages") { //If we have a held queue 'tab' open check if buttons exists if not add them
       if (!document.querySelector("[name='held-custom-buttons']")) {
-        addButton("Copy From (Envelope) list to clipboard", "held-custom-buttons", copyFromEnvelopeListHeldQueue, document.querySelector("[ng-reflect-name='Held Queue'] .mc-table-before-content-actions"));
-        addButton("Copy From (Header) list to clipboard", "held-custom-buttons", copyFromHeaderListHeldQueue, document.querySelector("[ng-reflect-name='Held Queue'] .mc-table-before-content-actions"));
-        addButton("Copy To list to clipboard", "held-custom-buttons", copyToListHeldQueue, document.querySelector("[ng-reflect-name='Held Queue'] .mc-table-before-content-actions"));
-        addButton("Copy Subject list to clipboard", "held-custom-buttons", copySubjectListHeldQueue, document.querySelector("[ng-reflect-name='Held Queue'] .mc-table-before-content-actions"));
+        addButton("Copy From (Envelope) list to clipboard", "held-custom-buttons", copyFromEnvelopeListHeldQueue, document.querySelector("[ng-reflect-name='Held Queue'] .mc-table-before-content-actions"))
+        addButton("Copy From (Header) list to clipboard", "held-custom-buttons", copyFromHeaderListHeldQueue, document.querySelector("[ng-reflect-name='Held Queue'] .mc-table-before-content-actions"))
+        addButton("Copy To list to clipboard", "held-custom-buttons", copyToListHeldQueue, document.querySelector("[ng-reflect-name='Held Queue'] .mc-table-before-content-actions"))
+        addButton("Copy Subject list to clipboard", "held-custom-buttons", copySubjectListHeldQueue, document.querySelector("[ng-reflect-name='Held Queue'] .mc-table-before-content-actions"))
 
       }
     } else if (location.hash == "#/message-center/message-tracking") { //If we have a message tracking 'tab' open check if buttons exists if not add them
       if (document.querySelector(".mc-tab-group-after-search") && document.querySelector("[tableid='message-center/message-tracking/main-table'] .mc-table-before-content-actions") && !document.querySelector("[name='tracking-custom-buttons']")) {
-        addButton("Copy From (Envelope) list to clipboard", "tracking-custom-buttons", copyFromEnvelopeListMessageTracking, document.querySelector("[tableid='message-center/message-tracking/main-table'] .mc-table-before-content-actions"));
-        addButton("Copy From (Header) list to clipboard", "tracking-custom-buttons", copyFromHeaderListMessageTracking, document.querySelector("[tableid='message-center/message-tracking/main-table'] .mc-table-before-content-actions"));
-        addButton("Copy To list to clipboard", "tracking-custom-buttons", copyToListMessageTracking, document.querySelector("[tableid='message-center/message-tracking/main-table'] .mc-table-before-content-actions"));
-        addButton("Copy Subject list to clipboard", "tracking-custom-buttons", copySubjectListMessageTracking, document.querySelector("[tableid='message-center/message-tracking/main-table'] .mc-table-before-content-actions"));
-        addButton("Copy Sender IP list to clipboard", "tracking-custom-buttons", copySenderIpListMessageTracking, document.querySelector("[tableid='message-center/message-tracking/main-table'] .mc-table-before-content-actions"));
+        addButton("Copy From (Envelope) list to clipboard", "tracking-custom-buttons", copyFromEnvelopeListMessageTracking, document.querySelector("[tableid='message-center/message-tracking/main-table'] .mc-table-before-content-actions"))
+        addButton("Copy From (Header) list to clipboard", "tracking-custom-buttons", copyFromHeaderListMessageTracking, document.querySelector("[tableid='message-center/message-tracking/main-table'] .mc-table-before-content-actions"))
+        addButton("Copy To list to clipboard", "tracking-custom-buttons", copyToListMessageTracking, document.querySelector("[tableid='message-center/message-tracking/main-table'] .mc-table-before-content-actions"))
+        addButton("Copy Subject list to clipboard", "tracking-custom-buttons", copySubjectListMessageTracking, document.querySelector("[tableid='message-center/message-tracking/main-table'] .mc-table-before-content-actions"))
+        addButton("Copy Sender IP list to clipboard", "tracking-custom-buttons", copySenderIpListMessageTracking, document.querySelector("[tableid='message-center/message-tracking/main-table'] .mc-table-before-content-actions"))
+      }
+    }
+    if (document.querySelector(".cdk-overlay-pane aside-container mc-forward")) { //Forward email panel exists
+      if (!document.querySelector("[name='forward-email-custom-buttons']")) {
+        addButton("Prefill AusCERT forwarding", "forward-email-custom-buttons", prefillAusCertForward, document.querySelector(".cdk-overlay-pane aside-container mc-forward mc-extra-container div"))
       }
     }
   }, 5000);
 
   function addButton(text, name, onclick, par) {
     let container = document.createElement("mc-list-dropdown-button")
-    par.appendChild(container);
-    container.className = "mc-table-actions mc-button-margin-right";
+    par.appendChild(container)
+    container.className = "mc-table-actions mc-button-margin-right"
     if (name == "tracking-custom-buttons") { //Hack since Message Tracking Export button has no default margin
-      container.style = "margin-left:10px";
+      container.style = "margin-left:10px"
     } else {
-      container.style = "margin-right:10px";
+      container.style = "margin-right:10px"
     }
 
     container.setAttribute("_ngcontent-c26", "")
-    let button = document.createElement("button");
+    let button = document.createElement("button")
     container.appendChild(button)
-    button.innerHTML = text;
+    button.innerHTML = text
     button.setAttribute("name", name)
-    button.className = "mc-table-actions btn btn-secondary mc-button-margin-right mc-button-margin-right"
+    button.className = "mc-table-actions btn btn-secondary mc-button-margin-right"
+    if (name == "forward-email-custom-buttons") { //Another hack since Forward panel uses different classes than other tabs
+      button.className += " panel-margin-left"
+    }
     // Setting function for button when it is clicked.
-    button.onclick = onclick;
-    return button;
+    button.onclick = onclick
+    return button
   }
 
   //God I hate these functions so much, will make this better at some point
+  function prefillAusCertForward() {
+    //Get company name from login info
+    let companyName = document.querySelector(".mc-user-details div[ng-bind='navbarCtrl.user.companyName']").innerText
+    document.querySelector(".cdk-overlay-pane aside-container mc-forward form mc-text-field[ng-reflect-name='to'] input").value = "auscert@auscert.org.au"
+    document.querySelector(".cdk-overlay-pane aside-container mc-forward form mc-text-field[ng-reflect-name='subject'] input").value = "Suspect emails attached"
+    document.querySelector(".cdk-overlay-pane aside-container mc-forward form textarea[ng-reflect-name='textBody']").value = `Hi team,
+
+Please find attached possible suspect emails. Please issue take downs and notify where required. Feel free to share the information with the CAUDIT-ISAC, but please remove any sensitive information as required.
+
+Kind regards,
+${companyName}`
+  }
+
   function copyFromHeaderListHeldQueue() {
     copyFromList("[ng-reflect-name='Held Queue']", "mc-column-fromHdr")
   }
@@ -91,10 +112,10 @@
 
   //Generic function to let us iterate over all rows matching a CSS selector and copy results to a line-break delimited list
   function copyFromList(panelSelector, columnClass) {
-    var list = [];
+    var list = []
     for (let elem of document.querySelectorAll(`${panelSelector} .mc-table-wrapper.panel .${columnClass}:not([role="columnheader"])`)) {
       list.push(elem.innerText)
     }
-    navigator.clipboard.writeText([...new Set(list)].join("\r\n")).then(() => alert("Copied to clipboard"));
+    navigator.clipboard.writeText([...new Set(list)].join("\r\n")).then(() => alert("Copied to clipboard"))
   }
 })();
