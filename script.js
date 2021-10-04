@@ -20,6 +20,8 @@
         addButton("Copy From (Header) list to clipboard", "held-custom-buttons", copyFromHeaderListHeldQueue, heldQueueButtonBox)
         addButton("Copy To list to clipboard", "held-custom-buttons", copyToListHeldQueue, heldQueueButtonBox)
         addButton("Copy Subject list to clipboard", "held-custom-buttons", copySubjectListHeldQueue, heldQueueButtonBox)
+        addButton("Sort emails by Spam Score (Ascending)","held-custom-buttons", () => { sortMessagesSpamScore('[ng-reflect-name="Held Queue"] mc-loader-full-container',true)},heldQueueButtonBox)
+        addButton("Sort emails by Spam Score (Descending)","held-custom-buttons", () => { sortMessagesSpamScore('[ng-reflect-name="Held Queue"] mc-loader-full-container',false)},heldQueueButtonBox)
       }
     } else if (location.hash == "#/message-center/message-tracking") { //If we have a message tracking 'tab' open check if buttons exists if not add them
       if (document.querySelector(".mc-tab-group-after-search")) {
@@ -31,6 +33,8 @@
           addButton("Copy To list to clipboard", "tracking-custom-buttons", copyToListMessageTracking, messageTrackingButtonBox)
           addButton("Copy Subject list to clipboard", "tracking-custom-buttons", copySubjectListMessageTracking, messageTrackingButtonBox)
           addButton("Copy Sender IP list to clipboard", "tracking-custom-buttons", copySenderIpListMessageTracking, messageTrackingButtonBox)
+          addButton("Sort emails by Spam Score (Ascending)","tracking-custom-buttons", () => { sortMessagesSpamScore('[tableid="message-center/message-tracking/main-table"] mc-loader-full-container',true)},messageTrackingButtonBox)
+          addButton("Sort emails by Spam Score (Descending)","tracking-custom-buttons", () => { sortMessagesSpamScore('[tableid="message-center/message-tracking/main-table"] mc-loader-full-container',false)},messageTrackingButtonBox)
         }
       }
     }
@@ -114,6 +118,23 @@ ${companyName}`
 
   function copySenderIpListMessageTracking() {
     copyFromList("[tableid='message-center/message-tracking/main-table']", "mc-column-senderIP")
+  }
+
+  function sortMessagesSpamScore(parentContainer,ascending) {
+      var emails = []
+      var container = document.querySelector(parentContainer)
+      for(var elem of container.getElementsByTagName("mc-body-row")) {
+          emails.push({"element":elem,"score":parseInt(elem.getElementsByClassName("mc-column-spamScore")[0].innerText)})
+      }
+      if(ascending) {
+          emails.sort((a,b) => {return a.score - b.score })
+      } else {
+          emails.sort((a,b) => {return b.score - a.score })
+      }
+      console.log(emails)
+      for(var email of emails) {
+          container.appendChild(email.element)
+      }
   }
 
   //Generic function to let us iterate over all rows matching a CSS selector and copy results to a line-break delimited list
