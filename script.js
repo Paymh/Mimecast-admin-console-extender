@@ -14,24 +14,30 @@
   setInterval(() => { //Check for new tasks every 5 seconds
     if (location.hash == "#/message-center/held-messages") { //If we have a held queue 'tab' open check if buttons exists if not add them
       if (!document.querySelector("[name='held-custom-buttons']")) {
-        addButton("Copy From (Envelope) list to clipboard", "held-custom-buttons", copyFromEnvelopeListHeldQueue, document.querySelector("[ng-reflect-name='Held Queue'] .mc-table-before-content-actions"))
-        addButton("Copy From (Header) list to clipboard", "held-custom-buttons", copyFromHeaderListHeldQueue, document.querySelector("[ng-reflect-name='Held Queue'] .mc-table-before-content-actions"))
-        addButton("Copy To list to clipboard", "held-custom-buttons", copyToListHeldQueue, document.querySelector("[ng-reflect-name='Held Queue'] .mc-table-before-content-actions"))
-        addButton("Copy Subject list to clipboard", "held-custom-buttons", copySubjectListHeldQueue, document.querySelector("[ng-reflect-name='Held Queue'] .mc-table-before-content-actions"))
-
+        var heldQueueContainer = document.querySelector("[ng-reflect-name='Held Queue']")
+        var heldQueueButtonBox = heldQueueContainer.querySelector(".mc-table-before-content-actions")
+        addButton("Copy From (Envelope) list to clipboard", "held-custom-buttons", copyFromEnvelopeListHeldQueue, heldQueueButtonBox)
+        addButton("Copy From (Header) list to clipboard", "held-custom-buttons", copyFromHeaderListHeldQueue, heldQueueButtonBox)
+        addButton("Copy To list to clipboard", "held-custom-buttons", copyToListHeldQueue, heldQueueButtonBox)
+        addButton("Copy Subject list to clipboard", "held-custom-buttons", copySubjectListHeldQueue, heldQueueButtonBox)
       }
     } else if (location.hash == "#/message-center/message-tracking") { //If we have a message tracking 'tab' open check if buttons exists if not add them
-      if (document.querySelector(".mc-tab-group-after-search") && document.querySelector("[tableid='message-center/message-tracking/main-table'] .mc-table-before-content-actions") && !document.querySelector("[name='tracking-custom-buttons']")) {
-        addButton("Copy From (Envelope) list to clipboard", "tracking-custom-buttons", copyFromEnvelopeListMessageTracking, document.querySelector("[tableid='message-center/message-tracking/main-table'] .mc-table-before-content-actions"))
-        addButton("Copy From (Header) list to clipboard", "tracking-custom-buttons", copyFromHeaderListMessageTracking, document.querySelector("[tableid='message-center/message-tracking/main-table'] .mc-table-before-content-actions"))
-        addButton("Copy To list to clipboard", "tracking-custom-buttons", copyToListMessageTracking, document.querySelector("[tableid='message-center/message-tracking/main-table'] .mc-table-before-content-actions"))
-        addButton("Copy Subject list to clipboard", "tracking-custom-buttons", copySubjectListMessageTracking, document.querySelector("[tableid='message-center/message-tracking/main-table'] .mc-table-before-content-actions"))
-        addButton("Copy Sender IP list to clipboard", "tracking-custom-buttons", copySenderIpListMessageTracking, document.querySelector("[tableid='message-center/message-tracking/main-table'] .mc-table-before-content-actions"))
+      if (document.querySelector(".mc-tab-group-after-search")) {
+        var messageTrackingContainer = document.querySelector('[tableid="message-center/message-tracking/main-table"]')
+        var messageTrackingButtonBox = messageTrackingContainer.querySelector(".mc-table-before-content-actions")
+        if (messageTrackingContainer && messageTrackingButtonBox && !document.querySelector("[name='tracking-custom-buttons']")) {
+            addButton("Copy From (Envelope) list to clipboard", "tracking-custom-buttons", copyFromEnvelopeListMessageTracking, messageTrackingButtonBox)
+            addButton("Copy From (Header) list to clipboard", "tracking-custom-buttons", copyFromHeaderListMessageTracking, messageTrackingButtonBox)
+          addButton("Copy To list to clipboard", "tracking-custom-buttons", copyToListMessageTracking, messageTrackingButtonBox)
+          addButton("Copy Subject list to clipboard", "tracking-custom-buttons", copySubjectListMessageTracking, messageTrackingButtonBox)
+          addButton("Copy Sender IP list to clipboard", "tracking-custom-buttons", copySenderIpListMessageTracking, messageTrackingButtonBox)
+        }
       }
     }
     if (document.querySelector(".cdk-overlay-pane aside-container mc-forward")) { //Forward email panel exists
       if (!document.querySelector("[name='forward-email-custom-buttons']")) {
-        addButton("Prefill AusCERT forwarding", "forward-email-custom-buttons", prefillAusCertForward, document.querySelector(".cdk-overlay-pane aside-container mc-forward mc-extra-container div"))
+        var forwardEmailContainer = document.querySelector(".cdk-overlay-pane aside-container mc-forward mc-extra-container div")
+        addButton("Prefill AusCERT forwarding", "forward-email-custom-buttons", prefillAusCertForward, forwardEmailContainer)
       }
     }
   }, 5000);
